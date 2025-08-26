@@ -865,6 +865,12 @@ A data structure that queries the number of ascending pairs within given bounds 
 =================================================================================================
 """
 
+
+"""
+=================================================================================================
+A data structure that queries the number of ascending pairs within given bounds in O(q) time.
+=================================================================================================
+"""
 mutable struct PairTree
     n::Int
     tree1::NDProductTree
@@ -888,23 +894,25 @@ end
 function generate_trees!(pt::PairTree, perm::Vector{Int})
     q = Int(floor(pt.n^(1/4)))
     row = col = Int(ceil(pt.n / q))
-    
+    # println("perm =", perm)
     for (x, y) in enumerate(perm)
         add_NDP(pt.tree1, [x-1, y], 1)
         add_NDP(pt.tree2, [x-1, y], sum_box_NDP(pt.tree1, [(0, x-1), (0, y)]))
-        
+
         v = Int(ceil(x / q)) - 1
+
         h = Int(ceil((y + 1) / q)) - 1
         
         if !haskey(pt.Vert, v)
             pt.Vert[v] = Set{Tuple{Int,Int}}()
         end
+        # println("v in gen trees = ", v)
         if !haskey(pt.Hori, h)
             pt.Hori[h] = Set{Tuple{Int,Int}}()
         end
         
-        push!(pt.Vert[v], (x, y))
-        push!(pt.Hori[h], (x, y))
+        push!(pt.Vert[v], (x-1, y))
+        push!(pt.Hori[h], (x-1, y))
     end
     
     for (x, y) in enumerate(perm)
@@ -918,8 +926,9 @@ function generate_trees!(pt::PairTree, perm::Vector{Int})
             
             add_NDP(pt.Vert_Trees[s], [x-1, y], 
                    sum_box_NDP(pt.tree1, [(0, min(x-1, (s + 1) * q)), (0, y)]))
+    
             add_NDP(pt.Hori_Trees[s], [x-1, y], 
-                   sum_box_NDP(pt.tree1, [(0, x-1), (1, min(y, (s + 1) * q))]))
+                   sum_box_NDP(pt.tree1, [(0, x-1), (0, min(y, (s + 1) * q))]))
         end
     end
 end
@@ -928,22 +937,23 @@ function count_asc_pairs(pt::PairTree, perm::Vector{Int}, bounds)
     q = Int(floor(pt.n^(1/4)))
     
     a = Int(floor((bounds[1][1]) / q))
-    b = Int(floor((bounds[1][2]) - 1 / q))
+    b = Int(floor((bounds[1][2] - 1) / q))
     c = Int(floor((bounds[2][1]) / q))
-    d = Int(floor((bounds[2][2]) - 1/ q))
+    d = Int(floor((bounds[2][2] - 1)/ q))
 
     M = Set{Tuple{Int,Int}}()
     
     for i in [a, b]
         if haskey(pt.Vert, i)
             for v in pt.Vert[i]
+                # println("v = ", v)
                 if (bounds[1][1] <= v[1] < bounds[1][2]) && (bounds[2][1] <= v[2] < bounds[2][2])
                     push!(M, v)
                 end
             end
         end
     end
-    
+    # println("M after verticals = ", M)
     for j in [c, d]
         if haskey(pt.Hori, j)
             for h in pt.Hori[j]
@@ -953,6 +963,7 @@ function count_asc_pairs(pt::PairTree, perm::Vector{Int}, bounds)
             end
         end
     end
+    # println("M after horizontals = ", M)
 
     asc_pairs = 0
     
@@ -989,7 +1000,7 @@ function count_asc_pairs(pt::PairTree, perm::Vector{Int}, bounds)
                     sum_box_NDP(pt.tree1, [(0, (a + 1) * q), (0, (c + 1) * q)])
 
     asc_pairs += tree2_sum - vert_sum - hori_sum + corner_product
-
+    # println("asc_pairs = ", asc_pairs)
     return asc_pairs
 end
 
@@ -1046,7 +1057,7 @@ function marked_count_43215(perm::Vector{Int})
     # if 1,5 not in same col, but 4,5 in same row
     #--------------------------------------------------------------
    
-    for row in (chunk):chunk:n-1
+    for row in chunk:chunk:n-1
         TT1 = NDProductTree(n, 2)
         TT2 = NDProductTree(n, 2)
         TT3 = NDProductTree(n, 2)
@@ -1089,6 +1100,7 @@ function marked_count_43215(perm::Vector{Int})
                 
     return sum_box_NDP(T_out, [(0, n), (0, n)])
 end
+
 
 # perm = [ 9,  0, 10,  8,  7,  1,  2, 13, 12, 14,  5, 11,  4,  3,  6] .+ 1
 # println("this thing here = ", marked_count_43215(perm))

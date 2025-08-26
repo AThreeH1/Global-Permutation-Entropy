@@ -7,6 +7,7 @@ include("profile3.jl")
 include("profile4.jl")
 include("profile5.jl")
 include("profile6.jl")
+# include("profiles_bruteforce.jl")
 
 function count_brute_force(pattern, permutation)
     count = 0
@@ -87,33 +88,38 @@ function gen_permutations(n::Int, batch::Int)
 end
 
 function test_profiles()
-    n = 15
-    Random.seed!(42)  # For reproducibility
-    permutation = randperm(n) 
+    for n in 5:50
+    # Random.seed!(42)  # For reproducibility
+        permutation = randperm(n) 
 
-    println("Testing profiles for permutation: ", permutation)
-    profile_two = sort(profile_2(permutation))
-    @assert profile_two == sort(profile_level_two_brute_force(permutation))
+        println("Testing profiles for permutation: ", permutation)
+        profile_two = sort(profile_2(permutation))
+        # @assert profile_two == sort(profile_bruteforce(permutation, 2))
 
-    profile_three = sort(profile_3(permutation))
-    @assert profile_three == sort(profile_level_three_brute_force(permutation))
+        profile_three = sort(profile_3(permutation))
+        @assert profile_three == sort(profile_level_three_brute_force(permutation))
 
-    profile_four = sort(profile_4(permutation))
-    @assert profile_four == sort(profile_level_four_brute_force(permutation))
+        profile_four = sort(profile_4(permutation))
+        @assert profile_four == sort(profile_level_four_brute_force(permutation))
 
-    profile_five = sort(profile_5(permutation))
-    @assert profile_five == sort(profile_level_five_brute_force(permutation))
+        profile_five = sort(profile_5(permutation))
+        @assert profile_five == sort(profile_level_five_brute_force(permutation))
 
-    profile_six = sort(profile_6(permutation))
-    @assert profile_six == sort(profile_level_six_brute_force(permutation))
+        profile_six = sort(profile_6(permutation))
+        @assert profile_six == sort(profile_level_six_brute_force(permutation))
+        
+    end
 
-    println("Timing profiles for permutation: ", permutation)
-    @btime profile_2($permutation)
-    @btime profile_3($permutation)
-    @btime profile_4($permutation)
-    @btime profile_5($permutation)
+    # println("Timing profiles for permutation: ", permutation)
+    # @btime profile_2($permutation)
+    # @btime profile_3($permutation)
+    # @btime profile_4($permutation)
+    # @btime profile_5($permutation)
+    # @btime profile_6($permutation)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     test_profiles()
 end
+
+test_profiles()
