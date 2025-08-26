@@ -3,7 +3,7 @@ include("profile3.jl")
 include("profile4.jl")
 include("profile5.jl")
 include("profile6.jl")
-# include("profiles_bruteforce.jl")
+include("profiles_bruteforce.jl")
 
 function global_permutation_entropy(sequence::Vector{<:Real}; order::Int, window_size::Int64, 
                                    stride::Int64 = 1, normalized::Bool = true, parallel::Bool = false, bruteforce::Bool=false)

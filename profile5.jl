@@ -417,12 +417,12 @@ function profile_5_parallel(perm::Vector{Int};
 end
 
 # A = [ 9,  0, 10,  8,  7,  1,  2, 13, 12, 14,  5, 11,  4,  3,  6] .+ 1
-A = [2, 3, 15, 8, 13, 11, 14, 6, 5, 12, 7, 10, 4, 16, 1, 9]
-println(A.-1)
-B = profile_5(A)
+# A = [2, 3, 15, 8, 13, 11, 14, 6, 5, 12, 7, 10, 4, 16, 1, 9]
+# println(A.-1)
+# B = profile_5(A)
 # C = profile_5_parallel(A)
-println(B)
-println(length(B))
+# println(B)
+# println(length(B))
 # println(C)
 # println(sum(B))
 # println(sum(C))

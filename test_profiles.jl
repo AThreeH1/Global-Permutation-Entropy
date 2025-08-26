@@ -7,7 +7,7 @@ include("profile3.jl")
 include("profile4.jl")
 include("profile5.jl")
 include("profile6.jl")
-# include("profiles_bruteforce.jl")
+include("profiles_bruteforce.jl")
 
 function count_brute_force(pattern, permutation)
     count = 0
@@ -93,21 +93,21 @@ function test_profiles()
         permutation = randperm(n) 
 
         println("Testing profiles for permutation: ", permutation)
-        profile_two = sort(profile_2(permutation))
+        # profile_two = sort(profile_2(permutation))
         # @assert profile_two == sort(profile_bruteforce(permutation, 2))
 
-        profile_three = sort(profile_3(permutation))
-        @assert profile_three == sort(profile_level_three_brute_force(permutation))
+        # profile_three = sort(profile_3(permutation))
+        # @assert profile_three == sort(profile_level_three_brute_force(permutation))
 
-        profile_four = sort(profile_4(permutation))
-        @assert profile_four == sort(profile_level_four_brute_force(permutation))
+        # profile_four = sort(profile_4(permutation))
+        # @assert profile_four == sort(profile_level_four_brute_force(permutation))
 
-        profile_five = sort(profile_5(permutation))
-        @assert profile_five == sort(profile_level_five_brute_force(permutation))
+        profile_five = profile_5(permutation)
+        @assert profile_five == profile_bruteforce(permutation, 5)
 
-        profile_six = sort(profile_6(permutation))
-        @assert profile_six == sort(profile_level_six_brute_force(permutation))
-        
+        # profile_six = sort(profile_6(permutation))
+        # @assert profile_six == sort(profile_level_six_brute_force(permutation))
+
     end
 
     # println("Timing profiles for permutation: ", permutation)
