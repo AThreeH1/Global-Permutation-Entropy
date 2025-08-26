@@ -1,0 +1,7 @@
+__pycache__/
+**/__pycache__/
+**/.DS_Store
+
+wandb/*
+/profile_dicts/profile_6.jld2
+/profile_dicts/profile_6.json
