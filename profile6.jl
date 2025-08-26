@@ -116,7 +116,7 @@ function split_python_items(s::AbstractString)
 end
 
 # Load JLD2 data instead of pickle
-@load "./parallel_implementation/profile_dicts/profile_6.jld2" julia_profiles
+@load "./profile_dicts/profile_6.jld2" julia_profiles
 profile_6_quadratic_loaded = julia_profiles
 
 all_keys_upto_6_2 = Set()
@@ -482,10 +482,10 @@ function profile_6_parallel(perm::Vector{Int};
     return [round(Int, occurrences[σ]) for σ in julia_perms]
 end
 
-A = [ 9,  0, 10,  8,  7,  1,  2, 13, 12, 14,  5, 11,  4,  3,  6] .+ 1
-B = profile_6(A)
-C = profile_6_parallel(A)
-println(B)
-println(C)
-println(sum(B))
-println(sum(C))
+# A = [ 9,  0, 10,  8,  7,  1,  2, 13, 12, 14,  5, 11,  4,  3,  6] .+ 1
+# B = profile_6(A)
+# C = profile_6_parallel(A)
+# println(B)
+# println(C)
+# println(sum(B))
+# println(sum(C))

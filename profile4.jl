@@ -115,7 +115,7 @@ function split_python_items(s::AbstractString)
     return items
 end
 
-@load "./parallel_implementation/profile_dicts/profile_4.jld2" julia_profiles
+@load "./profile_dicts/profile_4.jld2" julia_profiles
 profile_4_loaded = julia_profiles
 
 all_keys_upto_4 = Set()

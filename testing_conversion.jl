@@ -4,8 +4,8 @@ using PyCall, JLD2
 
 function main()
     # — Paths — 
-    PKL_PATH  = "./parallel_implementation/profile_dicts/profile_4.pkl"
-    JLD2_PATH = "./parallel_implementation/profile_dicts/profile_4.jld2"
+    PKL_PATH  = "./profile_dicts/profile_6.pkl"
+    JLD2_PATH = "./profile_dicts/profile_6.jld2"
 
     # — Load JLD2 data —
     println("Loading JLD2 from ", JLD2_PATH)

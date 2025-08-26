@@ -6,7 +6,7 @@ using Random
 include("counting_functions.jl")
 
 # Load JLD2 data instead of pickle
-@load "./parallel_implementation/profile_dicts/profile_3.jld2" julia_profiles
+@load "./profile_dicts/profile_3.jld2" julia_profiles
 profile_3_loaded = julia_profiles
 
 all_keys_upto_3 = Set()
