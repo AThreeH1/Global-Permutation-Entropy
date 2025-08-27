@@ -1,5 +1,8 @@
+###
+# Calculate profiles using the naive, polynomial-time algorithm.
+# Used for comparison with more efficient methods.
+###
 using Combinatorics
-# include("../parallel_implementation/profile5.jl")
 using BenchmarkTools
 using Base.Threads  
 

@@ -1,13 +1,49 @@
 # Global-Permutation-Entropy
-Complexity measure for ordinal patterns
+Package to calculate the complexity measure Global Permutation Entropy
+introduced in (REF).
 
-To calculate GPE:
- Step 1:
- Run setup.jl
- Step 2:
- Import GPE.jl and use global_permutation_entropy to calculate entropy. 
+# Setup
+Run the setup. This installs the necessary packages and generates the necessary files in profile_dicts/.
+ ```bash
+    $ julia setup.jl
+ ```
 
-Implementation Details:
+
+# Example
+Import GPE.jl and use global_permutation_entropy to calculate entropy.
+For example:
+```julia
+    include("GPE.jl")
+    random_data = randn(20)
+    entropy = global_permutation_entropy(random_data, order=3, window_size=10)
+    println(entropy) # Length 11, since there are 11 windows of size 10. Should give quite high entropy values for this random data.
+
+    strictly_increasing_data = collect(1:20)
+    println(strictly_increasing_data)
+    entropy = global_permutation_entropy(strictly_increasing_data, order=3, window_size=10)
+    println(entropy) # Length 11, should give entropy 0. since there is only one permutation pattern appearing.
+```
+
+# Tests
+To run the tests
+```bash
+    $ julia test_profiles.jl
+```
+
+# Parallel
+To use parallel execution, one needs to run julia with 
+the JULIA_NUM_THREADS=32 environment variable set.
+For example, to use 4 threads in the REPL:
+```bash
+    $ JULIA_NUM_THREADS=4 julia
+```
+or to run the tests:
+```bash
+    $ JULIA_NUM_THREADS=4 julia test_profiles.jl
+```
+
+
+# Implementation Details:
 
 The profiles are implemented in Julia, leveraging its built-in support for parallel computing allowing for efficient execution on multi-core systems.
 The core data structure is a dictionary, where each key is labeled as a specific algorithm
@@ -35,7 +71,3 @@ fine-grained parallelism within each group. For instance, in the 5-profile,
 all n pattern trees are evaluated in parallel across threads. This internal parallelization yields significant
 performance gains, especially since these computations dominate the runtime. The results from each threaded task are aggregated after computation.
 No external parallelization is used here.
-
-
-
-

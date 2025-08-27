@@ -9,6 +9,8 @@ using Symbolics
 
 
 mutable struct SumTree
+    # Segment tree for range sum queries.
+    # We only need suffix and prefix queries.
     length::Int
     arrays::Vector{Vector{Int}}
     
@@ -91,14 +93,10 @@ function vertex(permutation::Vector{Int}, tree)
     A = ones(Int, n)
     
     for (edge_label, child) in tree
-        # println("Processing edge: $edge_label")
-        # println("Child : $child") 
-
         child_result = edge(permutation, child, edge_label)
         A = A .* child_result
     end
     
-    # println("Final vertex values: $A")
     return A
 end
 
@@ -110,22 +108,16 @@ function edge(permutation::Vector{Int}, tree, edge_label::String)
     B = SumTree(n)
     S, W = edge_label
     
-    # println("S = $S, W = $W")
-    # println( "W == 'W'" + " : $(W == "W")")
     if W == 'W'
         for i in 1:n
             idx = permutation[i]
             if S == 'S'
                 tmp = sum_prefix(B, idx)
-                # print("Adding prefix sum for index $idx: $tmp, ")
                 C[i] = tmp
             else
                 C[i] = sum_suffix(B, idx)
             end
-            # print("Adding value $A[$i] to B at index $idx, ")
             add!(B, idx, A[i])
-            # print("C after addition: $C, ")
-            # println("B arrays: $(B.arrays)")
         end
     else
         for i in n:-1:1
@@ -139,7 +131,6 @@ function edge(permutation::Vector{Int}, tree, edge_label::String)
         end
     end
     
-    # println("final C values: $C, final B arrays: $(B.arrays)")
     return C
 end
 
@@ -241,14 +232,12 @@ function countW(permutation::Vector{Int}, tree;
                 push!(ret, 0)
             end
         end
-        # println("ret2 = ", ret)
 
     else
         # Python: else: …
         for i in 1:length(permutation)
         push!(ret, vertex_W(tree, i))
         end
-        # println("ret3  = ", ret)
     end
 
     return ret
@@ -356,7 +345,6 @@ function count_gen(permutation::Vector{Int},
 
     n     = length(permutation)
     chunk = floor(Int, n^(1/3))
-    # println("chunky boi= ", chunk)
     permT = invperm(permutation)
 
     total = 0
@@ -371,8 +359,6 @@ function count_gen(permutation::Vector{Int},
         )
     end
 
-    # println("total1 = ", total)
-
     # Sum over “not_B” blocks for the inverse_tree on permT
     for col in 1:chunk:(n)
         total += sum(
@@ -383,15 +369,12 @@ function count_gen(permutation::Vector{Int},
         )
     end
 
-    # println("total2 = ", total)
     # Finally, add the box‐based counts (with or without middle)
     total += count_Box(permutation,
                        left_trees,
                        middle_tree,
                        right_trees;
                        no_middle=no_middle)
-
-    # println("total3 = ", total)
 
     return total
 end
@@ -430,21 +413,19 @@ For query interval sums efficiently using dyadics
 """
 
 mutable struct NDProductTree
+    # Structure for efficient n-dimensional range/box sum queries.
     n::Int
     ndim::Int
     logn::Int
     table::Dict{Any,Int}
-    # table::Union{Dict{NTuple{2,Tuple{Int,Int}},Int}, Dict{NTuple{4,Tuple{Int,Int}},Int}}
 
     function NDProductTree(n::Int, ndim::Int)
         logn  = ceil(Int, log2(max(1, n)))
         table = Dict{Any,Int}()  
 
         if ndim == 2
-            # table = Dict{NTuple{2,Tuple{Int,Int}},Int}() 
             sizehint!(table, n^2 * (logn + 1)^2)
         elseif ndim == 4
-            # table = Dict{NTuple{4,Tuple{Int,Int}},Int}()
             sizehint!(table, n^2 * (logn + 1)^4)
         end
         new(n, ndim, logn, table)
@@ -740,13 +721,6 @@ end
 A data structure that queries the number of ascending pairs within given bounds in O(q) time.
 =================================================================================================
 """
-
-
-"""
-=================================================================================================
-A data structure that queries the number of ascending pairs within given bounds in O(q) time.
-=================================================================================================
-"""
 mutable struct PairTree
     n::Int
     tree1::NDProductTree
@@ -770,7 +744,6 @@ end
 function generate_trees!(pt::PairTree, perm::Vector{Int})
     q = Int(floor(pt.n^(1/4)))
     row = col = Int(ceil(pt.n / q))
-    # println("perm =", perm)
     for (x, y) in enumerate(perm)
         add_NDP(pt.tree1, [x-1, y], 1)
         add_NDP(pt.tree2, [x-1, y], sum_box_NDP(pt.tree1, [(0, x-1), (0, y)]))
@@ -829,7 +802,6 @@ function count_asc_pairs(pt::PairTree, perm::Vector{Int}, bounds)
             end
         end
     end
-    # println("M after verticals = ", M)
     for j in [c, d]
         if haskey(pt.Hori, j)
             for h in pt.Hori[j]
@@ -839,7 +811,6 @@ function count_asc_pairs(pt::PairTree, perm::Vector{Int}, bounds)
             end
         end
     end
-    # println("M after horizontals = ", M)
 
     asc_pairs = 0
     
@@ -876,7 +847,6 @@ function count_asc_pairs(pt::PairTree, perm::Vector{Int}, bounds)
                     sum_box_NDP(pt.tree1, [(0, (a + 1) * q), (0, (c + 1) * q)])
 
     asc_pairs += tree2_sum - vert_sum - hori_sum + corner_product
-    # println("asc_pairs = ", asc_pairs)
     return asc_pairs
 end
 
@@ -977,31 +947,6 @@ function marked_count_43215(perm::Vector{Int})
     return sum_box_NDP(T_out, [(0, n), (0, n)])
 end
 
-
-# perm = [ 9,  0, 10,  8,  7,  1,  2, 13, 12, 14,  5, 11,  4,  3,  6] .+ 1
-# println("this thing here = ", marked_count_43215(perm))
-
 rev1(p::Vector{Int}) = reverse(p)
 
 rev2(p::Vector{Int}) = [(length(p)) - (x-1) for x in p]
-
-function main()
-    # d1 =(("NW", (("NW", ()), ("SW", ()))),)
-    # d2 = (("NW", (("NW", ()), ("SW", ()))),)
-    # d3 = Any[]
-    # d4 = (("SW", ()),)
-    # d5 = Any[]
-    # pt_tree = Vector[[1, 2], [1, 2], [("x0+1", "x1"), ("x1+1", "n"), ("y1+1", "n"), ("0", "n")], [("x1+1", "n"), ("y0+1", "y1")]]
-    # n = 20
-    # perm = randperm(n) 
-    # # println(perm)
-    # @btime A = pt_count_level_5_quadratic($perm, $pt_tree)
-#     tree = inv_tree = (("NW", (("NW", ()),)),)
-#     left_tree = right_tree = []
-#     middle_tree = ()
-#     perm = [ 3, 11,  2,  0, 12,  1,  4,  9,  8, 13, 14, 10,  6,  5,  7] .+ 1
-#     println("COUNT WEST = ", countW(perm, tree))
-#     # println(count_gen(perm, tree, inv_tree, left_tree, middle_tree, right_tree))
-end
-
-# main()
