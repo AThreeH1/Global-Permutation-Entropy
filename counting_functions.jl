@@ -345,7 +345,6 @@ function count_gen(permutation::Vector{Int},
 
     n     = length(permutation)
     chunk = floor(Int, n^(1/3))
-    # println("chunky boi= ", chunk)
     permT = invperm(permutation)
 
     total = 0
@@ -360,8 +359,6 @@ function count_gen(permutation::Vector{Int},
         )
     end
 
-    # println("total1 = ", total)
-
     # Sum over “not_B” blocks for the inverse_tree on permT
     for col in 1:chunk:(n)
         total += sum(
@@ -372,15 +369,12 @@ function count_gen(permutation::Vector{Int},
         )
     end
 
-    # println("total2 = ", total)
     # Finally, add the box‐based counts (with or without middle)
     total += count_Box(permutation,
                        left_trees,
                        middle_tree,
                        right_trees;
                        no_middle=no_middle)
-
-    # println("total3 = ", total)
 
     return total
 end
