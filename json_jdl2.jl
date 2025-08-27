@@ -1,4 +1,7 @@
 #!/usr/bin/env julia
+###
+# Convert the profile dictionaries from JSON to JLD2 format for faster loading in Julia.
+###
 using JSON, JLD2
 
 # Hard-coded paths
