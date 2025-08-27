@@ -7,7 +7,7 @@ const NE, NW, SE, SW = "NE", "NW", "SE", "SW"
 using Combinatorics
 using Symbolics
 
-# CHECKED
+
 mutable struct SumTree
     length::Int
     arrays::Vector{Vector{Int}}
@@ -20,7 +20,7 @@ mutable struct SumTree
     end
 end
 
-# CHECKED
+
 function add!(tree::SumTree, i::Int, val::Int)
     """Add val to position i in the tree"""
     if i < 1 || i > tree.length
@@ -37,7 +37,7 @@ function add!(tree::SumTree, i::Int, val::Int)
     end
 end
 
-# CHECKED
+
 function sum_suffix(tree::SumTree, i::Int)
     """Sum of all elements at positions i+1 to n"""
     if i < 0 || i > tree.length
@@ -59,7 +59,7 @@ function sum_suffix(tree::SumTree, i::Int)
     return total
 end
 
-# CHECKED
+
 function sum_prefix(tree::SumTree, i::Int)
     """Sum of all elements at positions 1 to i-1"""
     if i < 1 || i > tree.length + 1
@@ -81,7 +81,11 @@ function sum_prefix(tree::SumTree, i::Int)
     return total
 end
 
-# EMPHERICALLY TESTED
+"""
+==============================================================================================================
+counting occurences of corner trees: vertex and edge functions
+==============================================================================================================
+"""
 function vertex(permutation::Vector{Int}, tree)
     n = length(permutation)
     A = ones(Int, n)
@@ -97,6 +101,7 @@ function vertex(permutation::Vector{Int}, tree)
     # println("Final vertex values: $A")
     return A
 end
+
 
 function edge(permutation::Vector{Int}, tree, edge_label::String)
     n = length(permutation)
@@ -137,6 +142,12 @@ function edge(permutation::Vector{Int}, tree, edge_label::String)
     # println("final C values: $C, final B arrays: $(B.arrays)")
     return C
 end
+
+"""
+==============================================================================================================
+counting occurences of pure west corner tree
+==============================================================================================================
+"""
 
 function countW(permutation::Vector{Int}, tree;
     row::Union{Nothing,Int}=nothing,
@@ -327,17 +338,13 @@ function count_Box(permutation::Vector{Int},
     return count
 end
 
+
+
+
 """
-    count_gen(permutation, tree, inverse_tree, left_trees, middle_tree, right_trees; no_middle=false)
-
-    - `tree` is the corner tree rooted in ME, once we remove MAX from the element of Tree_{5/3} of which we count the occurrences.
-    - `inverse_tree` is the corner tree obtained after swapping/exchanging labels of ME and MN.
-    - `left_trees` are the corner trees dangling from ME.
-    - `middle_tree` is the corner tree with root between ME and MN.
-    - `right_trees` are the corner trees dangling from MN.
-    - `no_middle`: if true, skips counting the middle-anchored configurations.
-
-    Returns the total count of all those configurations in `permutation`.
+==============================================================================================================
+counting occurences of TreeAlgo_5/3
+==============================================================================================================
 """
 function count_gen(permutation::Vector{Int},
                    tree,
@@ -389,7 +396,7 @@ function count_gen(permutation::Vector{Int},
     return total
 end
 
-# CHECKED
+
 function dyadic_range_1d(l::Int, r::Int)
     x = 1
     result = Tuple{Int, Int}[]
@@ -416,7 +423,12 @@ function dyadic_ranges_nd(bounds::Vector{Tuple{Int,Int}})
     return Iterators.product(ranges1d...)
 end
 
-# CHECKED
+"""
+==============================================================================================================
+For query interval sums efficiently using dyadics
+==============================================================================================================
+"""
+
 mutable struct NDProductTree
     n::Int
     ndim::Int
@@ -439,7 +451,7 @@ mutable struct NDProductTree
     end
 end
 
-# CHECKED
+
 function add_NDP(tree::NDProductTree, coords::Vector{Int}, value::Int)
     @assert length(coords) == tree.ndim
     # time_start = time_ns()
@@ -484,7 +496,7 @@ function add_NDP(tree::NDProductTree, coords::Vector{Int}, value::Int)
 end
 
 
-# CHECKED
+
 function sum_box_NDP(tree::NDProductTree, bounds)
     @assert length(bounds) == tree.ndim
     total = 0
@@ -500,7 +512,7 @@ function shape(c)
     return [findfirst(==(x), sc) for x in c]
 end
 
-# CHECKED
+
 function generate_matches(permutation, pattern)
     r = length(pattern)
     matches = []
@@ -515,7 +527,7 @@ function generate_matches(permutation, pattern)
 end
 
 @variables x0 x1 y0 y1 n
-# CHECKED
+
 function evaluate_expr(symbolic_input, values::Dict{String, Int})
     expr_sym = if symbolic_input isa String
         ex = Meta.parse(symbolic_input)     
@@ -539,147 +551,11 @@ function evaluate_expr(symbolic_input, values::Dict{String, Int})
     return Symbolics.value(substituted)  
 end
 
-function evaluate_bounds_fast(bounds_expressions, n::Int, x0::Int, x1::Int, y0::Int, y1::Int)
-    bounds = Vector{Tuple{Int, Int}}()
-    
-    for (left_expr, right_expr) in bounds_expressions
-        # Evaluate left bound
-        left_val = if left_expr == "x0+1"
-            x0 + 1
-        elseif left_expr == "x1+1"
-            x1 + 1
-        elseif left_expr == "y0+1"
-            y0 + 1
-        elseif left_expr == "y1+1"
-            y1 + 1
-        elseif left_expr == "0"
-            0
-        else
-            error("Unknown left expression: $left_expr")
-        end
-        
-        # Evaluate right bound
-        right_val = if right_expr == "n"
-            n
-        elseif right_expr == "x1"
-            x1
-        elseif right_expr == "y0"
-            y0
-        elseif right_expr == "y1"
-            y1
-        elseif right_expr == "0"
-            0
-        else
-            error("Unknown right expression: $right_expr")
-        end
-        
-        push!(bounds, (left_val, right_val))
-    end
-    
-    return bounds
-end
-
-
-function pt_count_level_5_quadratic(perm::Vector{Int}, pt_tree)
-    # total_start = time_ns()
-    
-    # Setup phase
-    # setup_start = time_ns()
-    n = length(perm) + 1
-    pt_tree[1] = pt_tree[1] .+ 1
-    pt_tree[2] = pt_tree[2] .+ 1
-    tree_two_three = NDProductTree(n, 4)
-    # setup_time = (time_ns() - setup_start) / 1e6
-    # println("Setup time NDP Product Tree: $(setup_time) ms")
-
-    # Pattern two-three matching and tree building
-    # pattern23_start = time_ns()
-    pattern_two_three = pt_tree[2]
-    matches_two_three = generate_matches(perm, pattern_two_three)
-    # pattern23_match_time = (time_ns() - pattern23_start) / 1e6
-    # println("Pattern 2-3 matching time: $(pattern23_match_time) ms")
-    
-    # tree23_build_start = time_ns()
-    @inbounds for match in matches_two_three
-        (x2, y2), (x3, y3) = match
-        add_NDP(tree_two_three, [x2, x3, y2, y3], 1)
-    end
-    # tree23_build_time = (time_ns() - tree23_build_start) / 1e6
-    # println("Add NDP Tree 2-3: $(tree23_build_time) ms ($(length(matches_two_three)) matches)")
-
-    # Tree four building
-    # tree4_start = time_ns()
-    tree_four = NDProductTree(n, 2)
-    @inbounds for (x4, y4) in enumerate(perm)
-        add_NDP(tree_four, [x4, y4], 1)
-    end
-    # tree4_time = (time_ns() - tree4_start) / 1e6
-    # println("Tree 4 Add NDP: $(tree4_time) ms")
-
-    # Pattern zero-one matching
-    # pattern01_start = time_ns()
-    pattern_zero_one = pt_tree[1]
-    matches_zero_one = generate_matches(perm, pattern_zero_one)
-    # pattern01_time = (time_ns() - pattern01_start) / 1e6
-    # println("Pattern 0-1 matching time: $(pattern01_time) ms ($(length(matches_zero_one)) matches)")
-    
-    # Main computation loop
-    # main_loop_start = time_ns()
-    count_DP_fast = 0
-    # bounds_eval_total = 0.0
-    # sum_box_total = 0.0
-    
-    @inbounds for (i, match) in enumerate(matches_zero_one)
-        (x0, y0), (x1, y1) = match
-
-        # context = Dict(
-        #     "n" => n,
-        #     "x1" => x1,
-        #     "x0" => x0,
-        #     "y0" => y0,
-        #     "y1" => y1
-        # )
-
-        # bounds_two_three = [
-        #     (evaluate_expr(left, context), evaluate_expr(right, context))
-        #     for (left, right) in pt_tree[3]
-        # ]
-        # # println(bounds_two_three)
-        # bounds_four = [
-        #     (evaluate_expr(left, context), evaluate_expr(right, context))
-        #     for (left, right) in pt_tree[4]
-        # ]
-
-        # Bounds evaluation timing
-        # bounds_start = time_ns()
-        bounds_two_three = evaluate_bounds_fast(pt_tree[3], n, x0, x1, y0, y1)
-        bounds_four = evaluate_bounds_fast(pt_tree[4], n, x0, x1, y0, y1)
-        # bounds_eval_total += (time_ns() - bounds_start) / 1e6
-        
-        # Sum box timing
-        # sum_box_start = time_ns()
-        result = sum_box_NDP(tree_two_three, bounds_two_three) * sum_box_NDP(tree_four, bounds_four)
-        # sum_box_total += (time_ns() - sum_box_start) / 1e6
-        
-        count_DP_fast += result
-        
-        # Print progress for long loops
-        # if i % 1000 == 0 || i == length(matches_zero_one)
-            # println("  Progress: $i/$(length(matches_zero_one)) matches processed")
-        # end
-    end
-    
-    # main_loop_time = (time_ns() - main_loop_start) / 1e6
-    # println("Main loop total time: $(main_loop_time) ms")
-    # println("  - Bounds evaluation total: $(bounds_eval_total) ms")
-    # println("  - Sum box operations total: $(sum_box_total) ms")
-    
-    # total_time = (time_ns() - total_start) / 1e6
-    # println("Total function time: $(total_time) ms")
-    
-    return count_DP_fast
-end
-
+"""
+==============================================================================================================
+For the counting of pattern trees with six vertices in quadratic time
+==============================================================================================================
+"""
 
 function pt_count_level_6_quadratic(perm::Vector{Int}, pt_tree)
     n = length(perm) + 1

@@ -46,22 +46,4 @@ function profile_2_batched(perms::Vector{Vector{Int}})
     return results
 end
 
-function main()
-    perm = randperm(500)
-    println("Time taken by profile 2 for a senquence of length 500:")
-    @btime profile_2($perm)
-
-    batch_sizes = [4, 8, 12, 16, 32]
-
-    for batch in batch_sizes
-        println("\n-- Batch Count: $batch --")
-        Random.seed!(1234)
-        perms = [randperm(500) for _ in 1:batch]
-
-        print("Time Taken for batched profile 2, Seq Len 500: ")
-        @btime profile_2_batched($perms)
-    end
-end
-
-# main()
 

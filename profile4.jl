@@ -235,36 +235,3 @@ function profile_4_batched(perms::Vector{Vector{Int}})
     return results
 end
 
-function main()
-
-    seq_lengths = [50, 100, 200, 500, 1000]
-
-    println("Threads available: ", nthreads())
-
-    println("\n=== Internal Parallel vs Sequential Timing ===")
-    for len in seq_lengths
-        println("\n-- Sequence Length: $len --")
-        Random.seed!(1234)
-        perm = randperm(len)
-
-        print("Sequential: ")
-        @btime profile_4($perm)
-
-        print("Internal Parallel: ")
-        @btime profile_4_parallel($perm)
-
-    end
-
-    batch_sizes = [4, 8, 12, 16, 32]
-
-    for batch in batch_sizes
-        println("\n-- Batch Count: $batch --")
-        Random.seed!(1234)
-        perms = [randperm(200) for _ in 1:batch]
-
-        print("Time Taken for batched profile 2, Seq Len 500: ")
-        @btime profile_4_batched($perms)
-    end
-end
-
-# main()

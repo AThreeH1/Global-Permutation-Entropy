@@ -171,11 +171,6 @@ function profile_5(perm::Vector{Int}; only_5::Bool = true, just_vector::Bool = t
                 
             occurrences_fast[key] = marked_count_43215(perm_transformed)
             
-        elseif tag == "pattern tree"
-            # Handle existing pattern tree logic
-            pattern_tree = [collect(sub) for sub in payload]
-            occurrences_fast[key] = pt_count_level_5_quadratic(perm, pattern_tree)
-            
         else
             # Default case - use vertex function
             occurrences_fast[key] = sum(vertex(perm, payload))
