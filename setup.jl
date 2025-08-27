@@ -1,5 +1,4 @@
 using Pkg
-using PyCall
 
 packages = [
     "Combinatorics",
@@ -17,6 +16,8 @@ for pkg in packages
 end
 
 println("All packages are installed.")
+
+using PyCall
 
 # Get the directory containing this script (where pkl_json.py is located)
 script_dir = dirname(abspath(@__FILE__))

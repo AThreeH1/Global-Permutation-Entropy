@@ -5,7 +5,7 @@ include("profile5.jl")
 include("profile6.jl")
 include("profiles_bruteforce.jl")
 
-function global_permutation_entropy(sequence::Vector{<:Real}; order::Int, window_size::Int64, 
+function global_permutation_entropy(sequence::Vector, order::Int, window_size::Int64; 
                                    stride::Int64 = 1, normalized::Bool = true, parallel::Bool = false, bruteforce::Bool=false)
     
     if bruteforce==true
@@ -189,11 +189,11 @@ end
 
 function main()
     seq = rand(1:100, 50)
-    # println(global_permutation_entropy(seq, 2, 10))
-    # println(global_permutation_entropy(seq, 3, 20))
+    println(global_permutation_entropy(seq, 2, 10))
+    println(global_permutation_entropy(seq, 3, 20))
     # println(global_permutation_entropy(seq, 4, 30))
-    println(global_permutation_entropy(seq, 5, 40))
-    println(global_permutation_entropy(seq, 5, 40, bruteforce=true))
+    # println(global_permutation_entropy(seq, 5, 40))
+    # println(global_permutation_entropy(seq, 5, 40, bruteforce=true))
     # println(global_permutation_entropy(seq, 6, 50))
 end
 
